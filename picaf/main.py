@@ -38,20 +38,24 @@ def build_command_line(
     return cmd
 
 
-def exec_for_file(file_name: str, command: Optional[str], pattern: Optional[re.Pattern], max_capture_number: int, dry_run: bool) -> None:
-    if command is None:
-        print("%s" % file_name)
-        return
+class FileAction:
+    def __init__(self, file_name: str, command: Optional[str], pattern: Optional[re.Pattern], max_capture_number: int, dry_run: bool):
+        self.file_name = file_name
+        self.dry_run = dry_run
+        self.cmd = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
 
-    cmd = build_command_line(command, file_name, pattern, max_capture_number)
+    def __call__(self):
+        if self.cmd is None:
+            print("%s" % self.file_name)
+            return
 
-    if dry_run:
-        print(shlex.join(cmd))
-        return
+        if self.dry_run:
+            print(shlex.join(self.cmd))
+            return
 
-    exit_code = subprocess.call(cmd)
-    if exit_code != 0:
-        sys.exit(exit_code)
+        exit_code = subprocess.call(self.cmd)
+        if exit_code != 0:
+            sys.exit(exit_code)
 
 
 __doc__ = """Make a clickable map of files from a text file.
@@ -104,8 +108,8 @@ def main():
                 sys.exit("Error: capture number should be zero or positive: `{%s}`" % m.group(1))
             max_capture_number = max(max_capture_number, n)
 
-    def eff(file_name):
-        exec_for_file(file_name, command, pattern, max_capture_number, dry_run)
+    def gen_action(file_name):
+        return FileAction(file_name, command, pattern, max_capture_number, dry_run)
 
     if textfile is not None:
         with open(textfile, 'r') as inp:
@@ -125,7 +129,7 @@ def main():
             if k == "file" and (pattern is None or pattern.match(s)):
                 if last_p < p:
                     row.append(sg.Text(L[last_p:p]))
-                row.append(sg.Button(s, key=lambda: eff(s)))
+                row.append(sg.Button(s, key=gen_action(s)))
                 last_p = p + len(s)
             else:
                 if last_p < p + len(s):
