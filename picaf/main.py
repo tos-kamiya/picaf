@@ -120,7 +120,7 @@ def main():
 
     sg.theme('LightGray')
 
-    layout = []
+    col = []
 
     for L in lines:
         row = []
@@ -138,10 +138,10 @@ def main():
         else:
             if last_p < len(L):
                     row.append(sg.Text(L[last_p :]))
-        layout.append(row)
+        col.append(row)
 
     mouse_position = pyautogui.position()
-    window = sg.Window('picaf', layout, location=mouse_position, resizable=True)
+    window = sg.Window('picaf', [[sg.Column(col, scrollable=True)]], location=mouse_position, resizable=True)
 
     while True:
         event, values = window.read()
