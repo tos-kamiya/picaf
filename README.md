@@ -38,9 +38,11 @@ By default, each time a button is pressed, print the filename. With the option `
 ### Options
 
 ```
--c COMMAND                Command line for the clicked file. `{0}` is a place holder to put a file name.
+-c COMMAND, --command=COMMAND     Command line for the clicked file. `{0}` is a place holder to put a file name.
 -p PAT, --pattern PAT     Pattern to filter / capture files.
 -n, --dry-run             Print commands without running.
 --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
---list-fonts              Print the fonts installed.
+--font-list               Print the fonts installed.
+--theme=THEME             Specify theme [default: LightGray].
+--theme-preview           Show theme previewer.
 ```
