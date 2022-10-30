@@ -3,6 +3,7 @@ import re
 import shlex
 import subprocess
 import sys
+import tkinter
 
 import PySimpleGUI as sg
 import pyautogui
@@ -69,25 +70,29 @@ __doc__ = """Make a clickable map of files from a text file.
 
 Usage:
   picaf [options] [<textfile>]
-  picaf --list-fonts
 
 Options:
   -c COMMAND, --command=COMMAND     Command line for the clicked file. `{0}` is a place holder to put a file name.
   -p PAT, --pattern=PAT     Pattern to filter / capture files.
   -n, --dry-run             Print commands without running.
   --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
-  --list-fonts              Print the fonts installed.
+  --font-list               Print the fonts installed.
+  --theme=THEME             Specify theme [default: LightGray].
+  --theme-preview           Show theme previewer.
 """
 
 
 def main():
     args = docopt(__doc__)
-    list_fonts: bool = args["--list-fonts"]
     font: Optional[str] = args["--font"]
     command: Optional[str] = args["--command"]
     textfile: Optional[str] = args["<textfile>"]
     dry_run: bool = args["--dry-run"]
     pattern_str: Optional[str] = args["--pattern"]
+    theme: str = args["--theme"]
+
+    list_fonts: bool = args["--font-list"]
+    preview_themes: str = args["--theme-preview"]
 
     pattern = re.compile(pattern_str) if pattern_str is not None else None
 
@@ -95,6 +100,16 @@ def main():
         fonts = list(sorted(set(sg.Text.fonts_installed_list())))
         print("\n".join(fonts))
         return
+    elif preview_themes:
+        sg.theme_previewer()
+        return
+
+    root = tkinter.Tk()
+    fixed_font = tkinter.font.nametofont('TkFixedFont').actual()
+    font_spec = fixed_font['family'], fixed_font['size']
+    root.withdraw()
+
+    sg.theme(theme)
 
     if font:
         ns = font.split(",")
@@ -105,7 +120,8 @@ def main():
         except ValueError:
             sys.exit("Error: font size must be integer")
         font_spec = ns[0], s
-        sg.set_options(font=font_spec)
+
+    sg.set_options(font=font_spec)
 
     max_capture_number = -1
     if command is not None:
@@ -124,8 +140,6 @@ def main():
     else:
         lines = sys.stdin.readlines()
     lines = [L.rstrip() for L in lines]
-
-    sg.theme("LightGray")
 
     rows = []
 
@@ -149,7 +163,7 @@ def main():
 
     mouse_position = pyautogui.position()
     layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
-    window = sg.Window("picaf", layout, location=mouse_position, resizable=True)
+    window = sg.Window("picaf", layout, margins=(0, 0), location=mouse_position, resizable=True)
 
     while True:
         event, values = window.read()
