@@ -67,7 +67,7 @@ Usage:
 
 Options:
   -c COMMAND, --command=COMMAND     Command line for the clicked file. `{0}` is a place holder to put a file name.
-  -p PAT, --pattern PAT     Pattern to filter / capture files.
+  -p PAT, --pattern=PAT     Pattern to filter / capture files.
   -n, --dry-run             Print commands without running.
   --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
   --list-fonts              Print the fonts installed.
