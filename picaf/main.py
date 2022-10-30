@@ -4,6 +4,7 @@ import shlex
 import subprocess
 import sys
 import tkinter
+import platform
 
 import PySimpleGUI as sg
 import pyautogui
@@ -61,9 +62,21 @@ class FileAction:
             print(shlex.join(self.cmd))
             return
 
-        exit_code = subprocess.call(self.cmd)
+        if platform.system() == 'Windows':
+            exit_code = subprocess.call(self.cmd, shell=True)  # you need shell=True in Windows for PATH environment variable to have an effect
+        else:
+            exit_code = subprocess.call(self.cmd)
         if exit_code != 0:
             sys.exit(exit_code)
+
+
+def make_window_fit_to_screen(window):
+    screen_size = sg.Window.get_screen_size()
+    size_limit = (screen_size[0] * 4 // 5, screen_size[1] * 4 // 5)
+    window_size = window.size
+    if window_size[0] > size_limit[0] or window_size[1] > size_limit[1]:
+        new_size = (min(window_size[0], size_limit[0]), min(window_size[1], size_limit[1]))
+        window.size = new_size
 
 
 __doc__ = """Make a clickable map of files from a text file.
@@ -164,6 +177,9 @@ def main():
     mouse_position = pyautogui.position()
     layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
     window = sg.Window("picaf", layout, margins=(0, 0), location=mouse_position, resizable=True)
+    window.finalize()
+
+    make_window_fit_to_screen(window)
 
     while True:
         event, values = window.read()
