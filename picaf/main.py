@@ -1,4 +1,3 @@
-from decimal import Underflow
 from typing import List, Optional
 import re
 import shlex
@@ -40,7 +39,14 @@ def build_command_line(
 
 
 class FileAction:
-    def __init__(self, file_name: str, command: Optional[str], pattern: Optional[re.Pattern], max_capture_number: int, dry_run: bool):
+    def __init__(
+        self,
+        file_name: str,
+        command: Optional[str],
+        pattern: Optional[re.Pattern],
+        max_capture_number: int,
+        dry_run: bool,
+    ):
         self.file_name = file_name
         self.dry_run = dry_run
         self.cmd = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
@@ -76,22 +82,22 @@ Options:
 
 def main():
     args = docopt(__doc__)
-    list_fonts: bool = args['--list-fonts']
-    font: Optional[str] = args['--font']
-    command: Optional[str] = args['--command']
-    textfile: Optional[str] = args['<textfile>']
-    dry_run: bool = args['--dry-run']
-    pattern_str: Optional[str] = args['--pattern']
+    list_fonts: bool = args["--list-fonts"]
+    font: Optional[str] = args["--font"]
+    command: Optional[str] = args["--command"]
+    textfile: Optional[str] = args["<textfile>"]
+    dry_run: bool = args["--dry-run"]
+    pattern_str: Optional[str] = args["--pattern"]
 
     pattern = re.compile(pattern_str) if pattern_str is not None else None
 
     if list_fonts:
         fonts = list(sorted(set(sg.Text.fonts_installed_list())))
-        print('\n'.join(fonts))
+        print("\n".join(fonts))
         return
 
     if font:
-        ns = font.split(',')
+        ns = font.split(",")
         if len(ns) != 2:
             sys.exit("Error: --font option requires FONTNAME:FONTSIZE as an argument")
         try:
@@ -113,13 +119,13 @@ def main():
         return FileAction(file_name, command, pattern, max_capture_number, dry_run)
 
     if textfile is not None:
-        with open(textfile, 'r') as inp:
+        with open(textfile, "r") as inp:
             lines = inp.readlines()
     else:
         lines = sys.stdin.readlines()
     lines = [L.rstrip() for L in lines]
 
-    sg.theme('LightGray')
+    sg.theme("LightGray")
 
     rows = []
 
@@ -138,12 +144,12 @@ def main():
                 last_p = p + len(s)
         else:
             if last_p < len(L):
-                    row.append(sg.Text(L[last_p :]))
+                row.append(sg.Text(L[last_p:]))
         rows.append(row)
 
     mouse_position = pyautogui.position()
     layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
-    window = sg.Window('picaf', layout, location=mouse_position, resizable=True)
+    window = sg.Window("picaf", layout, location=mouse_position, resizable=True)
 
     while True:
         event, values = window.read()
@@ -155,5 +161,5 @@ def main():
     window.close()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
