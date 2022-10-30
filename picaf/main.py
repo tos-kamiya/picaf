@@ -1,3 +1,4 @@
+from decimal import Underflow
 from typing import List, Optional
 import re
 import shlex
@@ -120,7 +121,7 @@ def main():
 
     sg.theme('LightGray')
 
-    col = []
+    rows = []
 
     for L in lines:
         row = []
@@ -129,7 +130,7 @@ def main():
             if k == "file" and (pattern is None or pattern.match(s)):
                 if last_p < p:
                     row.append(sg.Text(L[last_p:p]))
-                row.append(sg.Button(s, key=gen_action(s)))
+                row.append(sg.Button(s, pad=(0, 1), key=gen_action(s)))
                 last_p = p + len(s)
             else:
                 if last_p < p + len(s):
@@ -138,10 +139,11 @@ def main():
         else:
             if last_p < len(L):
                     row.append(sg.Text(L[last_p :]))
-        col.append(row)
+        rows.append(row)
 
     mouse_position = pyautogui.position()
-    window = sg.Window('picaf', [[sg.Column(col, scrollable=True)]], location=mouse_position, resizable=True)
+    layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
+    window = sg.Window('picaf', layout, location=mouse_position, resizable=True)
 
     while True:
         event, values = window.read()
