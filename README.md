@@ -28,7 +28,6 @@ pip install docopt-ng
 
 ```sh
 picaf [options] [<textfile>]
-picaf --list-fonts
 ```
 
 Launch a GUI application that displays text in the argument files, after convert each filename written in text into a clickable button.
