@@ -8,7 +8,7 @@ For installation instructions, please refer to the [picaf website](https://githu
 
 ## Example of Use
 
-picaf was originally designed for use with [dendro_text](https://github.com/tos-kamiya/dendro_text), which finds the similarity of text files and creates a dendrogram.
+`picaf` was originally designed for use with [dendro_text](https://github.com/tos-kamiya/dendro_text), which finds the similarity of text files and creates a dendrogram.
 
 In this example, make the filenames clickable in the output of `dendro_text` so that you can investigate the content of each file with a text editor.
 

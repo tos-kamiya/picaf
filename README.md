@@ -24,6 +24,13 @@ Install docopt-ng additionally.
 pip install docopt-ng
 ```
 
+
+If you want to run `picaf` with Python installed by brew on a Mac, you also need to install tkinter.
+
+```sh
+brew install python-tk
+```
+
 ## Usage
 
 ```sh
@@ -46,10 +53,20 @@ By default, each time a button is pressed, print the filename. With the option `
 --theme-preview           Show theme previewer.
 ```
 
-### Example of Use
+### Example of Use/Screenshots
 
 picaf was originally designed for use with [dendro_text](https://github.com/tos-kamiya/dendro_text), which finds the similarity of text files and creates a dendrogram.
 
 In this example, make the filenames clickable in the output of `dendro_text` so that you can investigate the content of each file with a text editor.
 
+**Ubuntu**
+
 ![](./images/fig1.png)
+
+**Windows**
+
+![](./images/fig-win-1.png)
+
+**Mac**
+
+![](./images/fig-mac-1.png)
