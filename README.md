@@ -1,6 +1,8 @@
 # picaf
 
-Show the window that allows you to click filenames, which are picked up by scanning input text file.
+`picaf` (Pick-up a file) is a tool to generate a clickable map of files.
+
+Show the window that allows you to click filenames, from text containing file names.
 
 A slightly similar tool is `python -m http.server`, which serves a web page including links to files in local directories.
 
@@ -10,7 +12,7 @@ A slightly similar tool is `python -m http.server`, which serves a web page incl
 pip install picaf
 ```
 
-If you get a ModuleNotFoundError when you run the picaf,
+If you get a ModuleNotFoundError when you run `picaf`,
 
 ```sh
 $ picaf -h
@@ -24,8 +26,8 @@ Install docopt-ng additionally.
 pip install docopt-ng
 ```
 
-
-If you want to run `picaf` with Python installed by brew on a Mac, you also need to install tkinter.
+For Mac users:  
+To run `picaf` with Python installed by `brew`, you also need to install tkinter.
 
 ```sh
 brew install python-tk
@@ -55,7 +57,7 @@ By default, each time a button is pressed, print the filename. With the option `
 
 ### Example of Use/Screenshots
 
-picaf was originally designed for use with [dendro_text](https://github.com/tos-kamiya/dendro_text), which finds the similarity of text files and creates a dendrogram.
+`picaf` was originally designed for use with [dendro_text](https://github.com/tos-kamiya/dendro_text), which finds the similarity of text files generate a dendrogram.
 
 In this example, make the filenames clickable in the output of `dendro_text` so that you can investigate the content of each file with a text editor.
 
