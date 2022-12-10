@@ -26,8 +26,15 @@ Install docopt-ng additionally.
 pip install docopt-ng
 ```
 
-For Mac users:  
-To run `picaf` with Python installed by `brew`, you also need to install tkinter.
+For Ubuntu/Mac users:  
+
+When `picaf` exits with an error such as `ModuleNotFoundError: No module named 'tkinter'`, install tkinter as follows:
+
+```sh
+apt install python3-tk
+```
+
+or
 
 ```sh
 brew install python-tk
