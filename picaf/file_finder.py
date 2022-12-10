@@ -4,12 +4,15 @@ import re
 
 MAX_FNAME = 256
 
-PUNCTUATION_RE = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
-WHITESPACE_RE = r"""[ \t\n\r\x0b\x0c]"""
+PUNCTUATION_RE_CLASS = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
+WHITESPACE_RE_CLASS = r"""[ \t\n\r\x0b\x0c]"""
 
-PAT_DELIMITER_RE = re.compile(r"(%s|%s)" % (PUNCTUATION_RE, WHITESPACE_RE))
-PAT_WHITESPACE_RE = re.compile(WHITESPACE_RE)
-PAT_PATHLIKE = re.compile(r".{1,%d}($|(?!%s|%s))" % (MAX_FNAME, PUNCTUATION_RE, WHITESPACE_RE))
+DELIMITER_RE = "[" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
+NON_DELIMITER_RE = "[^" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
+
+PAT_DELIMITER_RE = re.compile(DELIMITER_RE)
+PAT_WHITESPACE_RE = re.compile(WHITESPACE_RE_CLASS)
+PAT_PATHLIKE = re.compile(r"%s{1,%d}" % (NON_DELIMITER_RE, MAX_FNAME))
 
 
 def pathlike_iter(L):
