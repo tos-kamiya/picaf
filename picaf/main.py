@@ -88,6 +88,7 @@ Options:
   -c COMMAND, --command=COMMAND     Command line for the clicked file. `{0}` is a place holder to put a file name.
   -p PAT, --pattern=PAT     Pattern to filter / capture files.
   -n, --dry-run             Print commands without running.
+  -b, --batch               Batch mode. Run command for each file name found in the text file.
   --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
   --font-list               Print the fonts installed.
   --theme=THEME             Specify theme [default: LightGray].
@@ -101,6 +102,7 @@ def main():
     command: Optional[str] = args["--command"]
     textfile: Optional[str] = args["<textfile>"]
     dry_run: bool = args["--dry-run"]
+    batch: bool = args["--batch"]
     pattern_str: Optional[str] = args["--pattern"]
     theme: str = args["--theme"]
 
@@ -154,41 +156,48 @@ def main():
         lines = sys.stdin.readlines()
     lines = [L.rstrip() for L in lines]
 
-    rows = []
+    if batch:
+        for L in lines:
+            for p, k, s in existing_file_iter(L):
+                if k == "file" and (pattern is None or pattern.match(s)):
+                    action = gen_action(s)
+                    action()
+    else:
+        rows = []
 
-    for L in lines:
-        row = []
-        last_p = 0
-        for p, k, s in existing_file_iter(L):
-            if k == "file" and (pattern is None or pattern.match(s)):
-                if last_p < p:
-                    row.append(sg.Text(L[last_p:p]))
-                row.append(sg.Button(s, pad=(0, 1), key=gen_action(s)))
-                last_p = p + len(s)
+        for L in lines:
+            row = []
+            last_p = 0
+            for p, k, s in existing_file_iter(L):
+                if k == "file" and (pattern is None or pattern.match(s)):
+                    if last_p < p:
+                        row.append(sg.Text(L[last_p:p]))
+                    row.append(sg.Button(s, pad=(0, 1), key=gen_action(s)))
+                    last_p = p + len(s)
+                else:
+                    if last_p < p + len(s):
+                        row.append(sg.Text(L[last_p : p + len(s)]))
+                    last_p = p + len(s)
             else:
-                if last_p < p + len(s):
-                    row.append(sg.Text(L[last_p : p + len(s)]))
-                last_p = p + len(s)
-        else:
-            if last_p < len(L):
-                row.append(sg.Text(L[last_p:]))
-        rows.append(row)
+                if last_p < len(L):
+                    row.append(sg.Text(L[last_p:]))
+            rows.append(row)
 
-    mouse_position = pyautogui.position()
-    layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
-    window = sg.Window("picaf", layout, margins=(0, 0), location=mouse_position, resizable=True)
-    window.finalize()
+        mouse_position = pyautogui.position()
+        layout = [[sg.Column(rows, scrollable=True, expand_x=True, expand_y=True)]]
+        window = sg.Window("picaf", layout, margins=(0, 0), location=mouse_position, resizable=True)
+        window.finalize()
 
-    make_window_fit_to_screen(window)
+        make_window_fit_to_screen(window)
 
-    while True:
-        event, values = window.read()
-        if event is None:
-            break
-        if callable(event):
-            event()
+        while True:
+            event, values = window.read()
+            if event is None:
+                break
+            if callable(event):
+                event()
 
-    window.close()
+        window.close()
 
 
 if __name__ == "__main__":
