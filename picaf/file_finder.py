@@ -1,21 +1,23 @@
+from typing import Dict, Iterator, List, Tuple
+
 import os
 import re
 
 
-MAX_FNAME = 256
+MAX_FNAME: int = 256
 
-PUNCTUATION_RE_CLASS = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
-WHITESPACE_RE_CLASS = r"""[ \t\n\r\x0b\x0c]"""
+PUNCTUATION_RE_CLASS: str = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
+WHITESPACE_RE_CLASS: str = r"""[ \t\n\r\x0b\x0c]"""
 
-DELIMITER_RE = "[" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
-NON_DELIMITER_RE = "[^" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
+DELIMITER_RE: str = "[" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
+NON_DELIMITER_RE: str = "[^" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
 
-PAT_DELIMITER_RE = re.compile(DELIMITER_RE)
-PAT_WHITESPACE_RE = re.compile(WHITESPACE_RE_CLASS)
-PAT_PATHLIKE = re.compile(r"%s{1,%d}" % (NON_DELIMITER_RE, MAX_FNAME))
+PAT_DELIMITER_RE: re.Pattern = re.compile(DELIMITER_RE)
+PAT_WHITESPACE_RE: re.Pattern = re.compile(WHITESPACE_RE_CLASS)
+PAT_PATHLIKE: re.Pattern = re.compile(r"%s{1,%d}" % (NON_DELIMITER_RE, MAX_FNAME))
 
 
-def pathlike_iter(L):
+def pathlike_iter(L: str) -> Iterator[Tuple[int, str]]:
     """
     Iterate over substrings that satisfy the following conditions:
     * the previous char is start of line or one of DELIMITERS
@@ -41,9 +43,9 @@ def pathlike_iter(L):
                     yield i, p
 
 
-def existing_file_iter(L):
-    dir_to_files = dict()
-    dir_to_dirs = dict()
+def existing_file_iter(L: str) -> Iterator[Tuple[int, str, str]]:
+    dir_to_files: Dict[str, List[str]] = dict()
+    dir_to_dirs: Dict[str, List[str]] = dict()
     for pos, pathstr in pathlike_iter(L):
         d0, f0 = os.path.split(pathstr)
         d = d0

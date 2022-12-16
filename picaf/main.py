@@ -1,4 +1,5 @@
 from typing import List, Optional
+
 import re
 import shlex
 import subprocess
@@ -41,6 +42,10 @@ def build_command_line(
 
 
 class FileAction:
+    file_name: str
+    dry_run: bool
+    cmd: Optional[List[str]]
+
     def __init__(
         self,
         file_name: str,
@@ -53,7 +58,7 @@ class FileAction:
         self.dry_run = dry_run
         self.cmd = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
 
-    def __call__(self):
+    def __call__(self) -> None:
         if self.cmd is None:
             print("%s" % self.file_name)
             return
@@ -70,7 +75,7 @@ class FileAction:
             sys.exit(exit_code)
 
 
-def make_window_fit_to_screen(window):
+def make_window_fit_to_screen(window: sg.Window) -> None:
     screen_size = sg.Window.get_screen_size()
     size_limit = (screen_size[0] * 4 // 5, screen_size[1] * 4 // 5)
     window_size = window.size
