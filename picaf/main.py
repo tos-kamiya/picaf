@@ -42,10 +42,6 @@ def build_command_line(
 
 
 class FileAction:
-    file_name: str
-    dry_run: bool
-    cmd: Optional[List[str]]
-
     def __init__(
         self,
         file_name: str,
@@ -54,9 +50,9 @@ class FileAction:
         max_capture_number: int,
         dry_run: bool,
     ):
-        self.file_name = file_name
-        self.dry_run = dry_run
-        self.cmd = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
+        self.file_name: str = file_name
+        self.dry_run: bool = dry_run
+        self.cmd: Optional[List[str]] = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
 
     def __call__(self) -> None:
         if self.cmd is None:
