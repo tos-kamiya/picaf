@@ -113,11 +113,6 @@ def main():
     pattern_str: Optional[str] = args["--pattern"]
     theme: str = args["--theme"]
     shell_escape: bool = args["--shell-escape"]
-    if shell_escape:
-        if platform.system() == 'Windows':
-            shell_escape = False
-            print("> Warning: option --shell-escape was turned off, since it does not work on Windows OS.", file=sys.stderr, flash=True)
-
     list_fonts: bool = args["--font-list"]
     preview_themes: str = args["--theme-preview"]
 
