@@ -1,3 +1,5 @@
+[![Tests](https://github.com/tos-kamiya/picaf/actions/workflows/tests.yaml/badge.svg)](https://github.com/tos-kamiya/picaf/actions/workflows/tests.yaml)
+
 # picaf
 
 `picaf` (Pick-up a file) is a tool to generate a clickable map of files.
