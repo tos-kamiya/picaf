@@ -6,7 +6,7 @@ import re
 
 MAX_FNAME: int = 256
 
-PUNCTUATION_RE_CLASS: str = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
+PUNCTUATION_RE_CLASS: str = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}]"""  # not including ~ . / - _
 WHITESPACE_RE_CLASS: str = r"""[ \t\n\r\x0b\x0c]"""
 WHITESPACE_EXCEPT_FOR_SPACE_RE_CLASS: str = r"""[\t\n\r\x0b\x0c]"""
 
@@ -47,23 +47,17 @@ def pathlike_iter(L: str) -> Iterator[Tuple[int, str]]:
 def existing_file_iter(L: str) -> Iterator[Tuple[int, str, str]]:
     dir_to_files: Dict[str, List[str]] = dict()
     dir_to_dirs: Dict[str, List[str]] = dict()
-    for pos, pathstr in pathlike_iter(L):
-        d0, f0 = os.path.split(pathstr)
-        d = d0
-        if d == "":
-            d = "."
-        if not os.path.exists(d) or not os.path.isdir(d):
-            continue  # for pos, pathstr
 
+    def find_files_and_dirs(d):
         dir_files = dir_to_files.get(d, None)
         dir_dirs = dir_to_dirs.get(d, None)
         if dir_files is None:
             assert dir_dirs is None
             dir_files = []
             dir_dirs = []
-            fs = os.listdir(d)
+            fs = os.listdir(d if d != '' else os.curdir)
             for f in fs:
-                p = d + "/" + f
+                p = os.path.join(d, f)
                 if os.path.isfile(p):
                     dir_files.append(f)
                 elif os.path.isdir(p):
@@ -71,28 +65,34 @@ def existing_file_iter(L: str) -> Iterator[Tuple[int, str, str]]:
             dir_to_files[d] = dir_files
             dir_to_dirs[d] = dir_dirs
         assert dir_dirs is not None
+        return dir_files, dir_dirs
 
-        for df in dir_files:
-            if f0 == df:
-                yield pos, "file", pathstr
-                continue  # for df
-            elif f0.startswith(df):
-                assert len(df) < len(f0)
-                if PAT_DELIMITER_RE.match(f0[len(df)]):
-                    if d0:
-                        yield pos, "file", d + "/" + df
-                    else:
-                        yield pos, "file", df
-                    continue  # for df
-        for dd in dir_dirs:
-            if f0 == dd:
-                yield pos, "directory", pathstr
-                continue  # for df
-            elif f0.startswith(dd):
-                assert len(dd) < len(f0)
-                if PAT_DELIMITER_RE.match(f0[len(dd)]):
-                    if d0:
-                        yield pos, "directory", d + "/" + dd
-                    else:
-                        yield pos, "directory", dd
-                    continue  # for df
+    for pos, pathstr in pathlike_iter(L):
+        p0 = pathstr
+        existing_file_or_dir_found = False
+        while not existing_file_or_dir_found:
+            d0, f0 = os.path.split(p0)
+            if d0 == '' or os.path.exists(d0) and os.path.isdir(d0):
+                dir_files, dir_dirs = find_files_and_dirs(d0)
+
+                for df in dir_files:
+                    if f0 == df:
+                        yield pos, "file", os.path.join(d0, df)
+                        existing_file_or_dir_found = True
+                    elif f0.startswith(df):
+                        assert len(df) < len(f0)
+                        if PAT_DELIMITER_RE.match(f0[len(df)]):
+                            yield pos, "file", os.path.join(d0, df)
+                            existing_file_or_dir_found = True
+                for dd in dir_dirs:
+                    if f0 == dd:
+                        yield pos, "directory", os.path.join(d0, dd)
+                        existing_file_or_dir_found = True
+                    elif f0.startswith(dd):
+                        assert len(dd) < len(f0)
+                        if PAT_DELIMITER_RE.match(f0[len(dd)]):
+                            yield pos, "directory", os.path.join(d0, dd)
+                            existing_file_or_dir_found = True
+            if d0 in ['', '/']:
+                break  # while not existing_file_or_dir_found
+            p0 = d0
