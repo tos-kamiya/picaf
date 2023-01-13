@@ -57,6 +57,7 @@ By default, each time a button is pressed, print the filename. With the option `
 -p PAT, --pattern=PAT     Pattern to filter / capture files.
 -n, --dry-run             Print commands without running.
 -b, --batch               Batch mode. Run command for each file name found in the text file.
+-e, --shell-escape        Shell-escaping file names in expanding `{0}`.
 --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
 --font-list               Print the fonts installed.
 --theme=THEME             Specify theme [default: LightGray].
