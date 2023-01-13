@@ -8,9 +8,10 @@ MAX_FNAME: int = 256
 
 PUNCTUATION_RE_CLASS: str = r"""[!"#$%&'()*+,:;<=>?@\[\\\]^`{|}~]"""  # not including . / - _
 WHITESPACE_RE_CLASS: str = r"""[ \t\n\r\x0b\x0c]"""
+WHITESPACE_EXCEPT_FOR_SPACE_RE_CLASS: str = r"""[\t\n\r\x0b\x0c]"""
 
 DELIMITER_RE: str = "[" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
-NON_DELIMITER_RE: str = "[^" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_RE_CLASS[1:-1] + "]"
+NON_DELIMITER_RE: str = "[^" + PUNCTUATION_RE_CLASS[1:-1] + WHITESPACE_EXCEPT_FOR_SPACE_RE_CLASS[1:-1] + "]"
 
 PAT_DELIMITER_RE: re.Pattern = re.compile(DELIMITER_RE)
 PAT_WHITESPACE_RE: re.Pattern = re.compile(WHITESPACE_RE_CLASS)
