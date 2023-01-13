@@ -48,9 +48,14 @@ class FileAction:
         command: Optional[str],
         pattern: Optional[re.Pattern],
         max_capture_number: int,
-        dry_run: bool,
+        dry_run: bool = False,
+        shell_escape: bool = False,
     ):
         self.file_name: str = file_name
+        self.shell_escape = shell_escape
+        if self.shell_escape:
+            assert platform.system() != 'Windows'
+            self.file_name = shlex.quote(self.file_name)
         self.dry_run: bool = dry_run
         self.cmd: Optional[List[str]] = build_command_line(command, file_name, pattern, max_capture_number) if command is not None else None
 
@@ -90,6 +95,7 @@ Options:
   -p PAT, --pattern=PAT     Pattern to filter / capture files.
   -n, --dry-run             Print commands without running.
   -b, --batch               Batch mode. Run command for each file name found in the text file.
+  -e, --shell-escape        Shell-escaping file names in expanding `{0}`.
   --font=NAMESIZE           Specify font name and size, e.g. `"Noto Sans,12"`
   --font-list               Print the fonts installed.
   --theme=THEME             Specify theme [default: LightGray].
@@ -106,6 +112,11 @@ def main():
     batch: bool = args["--batch"]
     pattern_str: Optional[str] = args["--pattern"]
     theme: str = args["--theme"]
+    shell_escape: bool = args["--shell-escape"]
+    if shell_escape:
+        if platform.system() == 'Windows':
+            shell_escape = False
+            print("> Warning: option --shell-escape was turned off, since it does not work on Windows OS.", file=sys.stderr, flash=True)
 
     list_fonts: bool = args["--font-list"]
     preview_themes: str = args["--theme-preview"]
@@ -148,7 +159,8 @@ def main():
             max_capture_number = max(max_capture_number, n)
 
     def gen_action(file_name):
-        return FileAction(file_name, command, pattern, max_capture_number, dry_run)
+        return FileAction(file_name, command, pattern, max_capture_number,
+                dry_run=dry_run, shell_escape=shell_escape)
 
     if textfile is not None:
         with open(textfile, "r") as inp:
